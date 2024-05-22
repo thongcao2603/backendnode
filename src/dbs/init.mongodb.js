@@ -1,8 +1,10 @@
 'use strict'
 
 const mongoose = require('mongoose')
+const {db:{host,name,port}} = require('../configs/config.mongodb')
+require('dotenv').config()
 
-const connectString = `mongodb://localhost:27017/dev`
+const connectString = `mongodb://${host}:${port}/${name}`
 
 class Database {
     constructor() {
@@ -14,7 +16,7 @@ class Database {
             mongoose.set('debug', true)
             mongoose.set('debug', { color: true })
         }
-        mongoose.connect(connectString)
+        mongoose.connect(connectString,{maxPoolSize:100})
             .then(() => {
                 console.log('Connected Mongodb success')
             })

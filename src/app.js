@@ -13,12 +13,6 @@ app.use(compression())
 require('./dbs/init.mongodb')
 
 //init routes
-app.get('/',(req,res,next)=>{
-    stringComp = "hello"
-    return res.status(200).send({
-        name:"thong",
-        message:stringComp.repeat(1000)
-    })
-})
+app.use('/',require('./routes'))
 
 module.exports = app
