@@ -6,7 +6,7 @@ const HEADER={
     API_KEY:'x-api-key',
     AUTHORIZATION:'authorization'
 }
-
+// find apiKey in db 
 const apiKey = async (req,res,next)=>{
     try {
         const key = req.headers[HEADER.API_KEY]?.toString()
@@ -29,6 +29,24 @@ const apiKey = async (req,res,next)=>{
     }
 }
 
+const permissions = (permission)=>{
+    return (req,res,next)=>{
+        if (!req.objKey.permissions){
+            return res.status(403).json({
+                message:'permission denied'
+            })
+        }
+        const validPermission = req.objKey.permissions.includes(permission)
+        if (!validPermission){
+            return res.status(403).json({
+                message:'permission denied'
+            })
+        }
+        return next()
+    }
+}
+
 module.exports = {
-    apiKey
+    apiKey,
+    permissions
 }
