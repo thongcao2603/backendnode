@@ -31,7 +31,15 @@ class BadRequestError extends ErrorResponse{
     }
 }
 
+class AuthFailureError extends ErrorResponse{
+    constructor(message="Unauthorized",statusCode=401){
+        super(message,statusCode)
+
+    }
+}
+
 module.exports ={
+    AuthFailureError,
     ConflicRequestError,
     BadRequestError
 }

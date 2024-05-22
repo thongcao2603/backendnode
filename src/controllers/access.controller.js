@@ -7,7 +7,7 @@ class AccessController{
     signUp = async(req,res,next)=>{
 
         new CREATED({
-            message:'Regiserted OK!',
+            message:'Registerted OK!',
             metadata:await AccessService.signUp(req.body)
         }).send(res)
 
