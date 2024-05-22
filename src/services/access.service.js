@@ -18,23 +18,43 @@ const RoleShop = {
 class AccessService {
 
     static login = async ({ email, password, refreshToken = null }) => {
+
+        //check shop exists by email
         const foundShop = await findByEmail({ email })
         if (!foundShop) throw new BadRequestError('Shop not registered')
-
+        //compare password input with password found from foundShop
         const match = bcrypt.compare(password, foundShop.password)
         if (!match) throw new AuthFailureError('Authentication error')
 
-        const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-            modulusLength: 4096,
+        const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+            modulusLength: 2048,
             publicKeyEncoding: {
-                type: 'pkcs1',
+                type: 'spki',
                 format: 'pem'
             },
             privateKeyEncoding: {
-                type: 'pkcs1',
+                type: 'pkcs8',
                 format: 'pem'
             }
-        })
+        });
+
+        const {_id:userId} = foundShop
+        //create again accesstoken, refreshtoken for user
+        const tokens = await createTokenPair({
+            userId, email
+        },
+            publicKey,
+            privateKey)
+        //save again refreshtoken, privkey, pubkey to db
+         await KeyTokenService.createKeyToken({
+            refreshToken:tokens.refreshToken,
+            privateKey,publicKey,userId
+         })   
+
+        return {
+            shop: getInfoData({ fileds: ['_id', 'name', 'email'], object: foundShop }),
+            tokens
+        }
 
     }
 
@@ -58,23 +78,23 @@ class AccessService {
             const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
                 modulusLength: 2048,
                 publicKeyEncoding: {
-                  type: 'spki',
-                  format: 'pem'
+                    type: 'spki',
+                    format: 'pem'
                 },
                 privateKeyEncoding: {
-                  type: 'pkcs8',
-                  format: 'pem'
+                    type: 'pkcs8',
+                    format: 'pem'
                 }
-              });
+            });
 
-           //save publickey, privatekey into db
+            //save publickey, privatekey into db
             const keyStore = await KeyTokenService.createKeyToken({
                 userId: newShop._id,
                 publicKey,
                 privateKey
             })
 
-            if (!keyStore){
+            if (!keyStore) {
                 throw new BadRequestError("Something went wrong")
             }
 

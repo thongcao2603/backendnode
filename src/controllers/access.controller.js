@@ -1,14 +1,21 @@
 'use strict'
 
-const { CREATED } = require("../core/success.response")
+const { CREATED, OK } = require("../core/success.response")
 const AccessService = require("../services/access.service")
 
-class AccessController{
-    signUp = async(req,res,next)=>{
+class AccessController {
+    login = async (req, res, next) => {
+        new OK({
+            message: 'Login success',
+            metadata: await AccessService.login(req.body)
+        }).send(res)
+    }
+
+    signUp = async (req, res, next) => {
 
         new CREATED({
-            message:'Registerted OK!',
-            metadata:await AccessService.signUp(req.body)
+            message: 'Registerted OK!',
+            metadata: await AccessService.signUp(req.body)
         }).send(res)
 
     }
