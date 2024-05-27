@@ -7,7 +7,8 @@ const { findByUserId } = require('../services/keyToken.service')
 const HEADER={
     API_KEY:'x-api-key',
     CLIENT_ID:'x-client-id',
-    AUTHORIZATION:'authorization'
+    AUTHORIZATION:'authorization',
+    REFRESHTOKEN:'x-rtoken-id'
 }
 
 const createTokenPair = async(payload, publicKey, privateKey)=>{
@@ -39,6 +40,7 @@ const createTokenPair = async(payload, publicKey, privateKey)=>{
 //authentication
 //require header client_id:userId, save at front end
 //require authorization
+
 const authentication = asyncHandler(async (req,res,next)=>{
     const userId = req.headers[HEADER.CLIENT_ID]
     if(!userId) throw new AuthFailureError("Invalid request")
@@ -48,13 +50,37 @@ const authentication = asyncHandler(async (req,res,next)=>{
 
     const accessToken = req.headers[HEADER.AUTHORIZATION]
     if(!accessToken) throw new AuthFailureError('Invalid request')
-
+        
     try {
         const decodeUser = jwt.verify(accessToken,keyStore.publicKey)
         if(userId !== decodeUser.userId){
             throw new AuthFailureError('Invalid user')
         }
         req.keyStore=keyStore
+        req.user = decodeUser
+        return next()
+    } catch (error) {
+        throw error
+    }
+})
+const authenticationRefresh = asyncHandler(async (req,res,next)=>{
+    const userId = req.headers[HEADER.CLIENT_ID]
+    if(!userId) throw new AuthFailureError("Invalid request")
+
+    const keyStore = await findByUserId(userId)
+    if(!keyStore) throw new NotFoundError('Not found keystore')
+
+    const refreshToken = req.headers[HEADER.REFRESHTOKEN]
+    if(!refreshToken) throw new AuthFailureError('Invalid request')
+        
+    try {
+        const decodeUser = jwt.verify(refreshToken,keyStore.privateKey)
+        if(userId !== decodeUser.userId){
+            throw new AuthFailureError('Invalid user')
+        }
+        req.keyStore=keyStore
+        req.user = decodeUser
+        req.refreshToken = refreshToken
         return next()
     } catch (error) {
         throw error
@@ -68,5 +94,6 @@ const verifyJWT = async(token,keySecret)=>{
 module.exports  = {
     createTokenPair,
     authentication,
+    authenticationRefresh,
     verifyJWT
 }

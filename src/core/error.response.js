@@ -1,13 +1,6 @@
 'use strict'
 
-const StatusCode={
-    FORBIDEN:403,
-    CONFLICT:409
-}
-const ReasonStatusCode={
-    FORBIDEN:'Bad request error',
-    CONFLICT:'Conflict error'
-}
+const {StatusCodes,ReasonPhrases} = require('./httpStatusCode')
 
 class ErrorResponse extends Error{
     constructor(message,status){
@@ -18,35 +11,35 @@ class ErrorResponse extends Error{
 }
 
 class ForbidenError extends ErrorResponse{
-    constructor(message=ReasonStatusCode.FORBIDEN,statusCode=StatusCode.FORBIDEN){
+    constructor(message=ReasonPhrases.FORBIDDEN,statusCode=StatusCodes.FORBIDDEN){
         super(message,statusCode)
 
     }
 }
 
 class ConflicRequestError extends ErrorResponse{
-    constructor(message=ReasonStatusCode.CONFLICT,statusCode=StatusCode.CONFLICT){
+    constructor(message=ReasonPhrases.CONFLICT,statusCode=StatusCodes.CONFLICT){
         super(message,statusCode)
 
     }
 }
 
 class BadRequestError extends ErrorResponse{
-    constructor(message=ReasonStatusCode.FORBIDEN,statusCode=StatusCode.FORBIDEN){
+    constructor(message=ReasonPhrases.BAD_REQUEST,statusCode=StatusCodes.BAD_REQUEST){
         super(message,statusCode)
 
     }
 }
 
 class AuthFailureError extends ErrorResponse{
-    constructor(message="Unauthorized",statusCode=401){
+    constructor(message=ReasonPhrases.NON_AUTHORITATIVE_INFORMATION,statusCode=StatusCodes.NON_AUTHORITATIVE_INFORMATION){
         super(message,statusCode)
 
     }
 }
 
 class NotFoundError extends ErrorResponse{
-    constructor(message="NotFound",statusCode=404){
+    constructor(message=ReasonPhrases.NOT_FOUND,statusCode=StatusCodes.NOT_FOUND){
         super(message,statusCode)
 
     }

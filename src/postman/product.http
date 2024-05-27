@@ -1,0 +1,23 @@
+@url_dev=http://localhost:3333/api/v1
+
+POST {{url_dev}}/product
+Content-Type: application/json    
+x-api-key:1111
+x-client-id:6652fe88b190ad9be52e0aee
+authorization:eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjUyZmU4OGIxOTBhZDliZTUyZTBhZWUiLCJlbWFpbCI6ImhlaGVoZWhlOSIsImlhdCI6MTcxNjg0MTk3NSwiZXhwIjoxNzE3MDE0Nzc1fQ.ndYXAKQHihQJPeZYd1V3KjrjE8QXUubl72txbzFZ3jVqIPcOUKSs8baYYPgmISj3AJzGQ7p0hw0HdlWSyGtDfpWADnQ2P5Xz_qQEsRNFUurHjJ0senzIAFfapKCxPUXl2wwEPUk2I0Hv-uxOb_ekEmBzQ0pTZsDxgST7v_65yKS7pHvAK_qFh5w8zCwKsMe-R5AwIsqwu3MCsdmpvQJIcmrZSsb5omatGf5misfFmcZsZ9qVgUGqbODEk15YNgdQMfmKT7wFp3hWrvnmb6lRiCqWa-BOxacpL3C67njp8OH-fubhd7w8dakp9H-BCqynUGRCdXf_9h__MTfqIbppGQ
+
+{
+   "product_name":"New jeans",
+    "product_description":"High-quality denim jeans",
+    "product_price":"50",
+    "product_shop":"6652fe88b190ad9be52e0aee",
+    "product_type":"Clothing",
+    "product_thumb":"product_thumb",
+    "product_quantity":"5",
+    "product_attributes":{
+        "brand":"Levi",
+        "size":"L",
+        "material":"coton"
+    }
+}
+ 

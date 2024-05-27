@@ -5,9 +5,14 @@ const AccessService = require("../services/access.service")
 
 class AccessController {
     refreshToken = async(req,res,next)=>{
+        console.log(req.keyStore)
         new OK({
             message:'Success!',
-            metadata: await AccessService.handleRefreshToken(req.body.refreshToken)
+            metadata: await AccessService.handleRefreshToken({
+                keyStore:req.keyStore,
+                refreshToken:req.refreshToken,
+                user:req.user
+            })
         }).send(res)
     }
 

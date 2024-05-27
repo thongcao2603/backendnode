@@ -17,34 +17,28 @@ const RoleShop = {
 
 class AccessService {
 //handle refreshtoken
-    static handleRefreshToken = async(refreshToken)=>{
+    static handleRefreshToken = async({keyStore, user,refreshToken})=>{
         //tim token trong cac token da su dung
         //neu ton tai, xoa keyToken in db
-        const foundToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken)
-        if (foundToken){
-            const {userId,email} = await verifyJWT(refreshToken,foundToken.privateKey)
-            await KeyTokenService.deleteKeyById(userId)
-            throw new ForbidenError("Something wrong!!! pls relogin")
+
+        const {userId,email} = user
+        if (keyStore.refreshTokensUsed.includes(refreshToken)){
+
+             await KeyTokenService.deleteKeyById(userId)
+             throw new ForbidenError("Something wrong!!! pls relogin")
         }
-       
-       // neu khong tim thay token da su dung, ok!!!
-        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken)
-        if (!holderToken) throw new AuthFailureError("Shop is not registered 1!")
-            console.log(holderToken)
-        //verify token
-        const {userId, email} = await verifyJWT(refreshToken,holderToken.privateKey)
 
         const foundShop = await findByEmail({email})
-        if (!foundShop) throw new AuthFailureError("Shop is not registered 2!")
+        if (!foundShop) throw new AuthFailureError("Shop is not registered!")
 
-        const tokens = await createTokenPair({userId,email}, holderToken.publicKey, holderToken.privateKey)
+        const tokens = await createTokenPair({userId,email}, keyStore.publicKey, keyStore.privateKey)
 
-        await holderToken.updateOne({
+        await keyStore.updateOne({
             $set:{
                 refreshToken : tokens.refreshToken
             },
             $addToSet:{
-                refreshTokenUsed:refreshToken
+                refreshTokensUsed:refreshToken
             }
         })
 
@@ -90,7 +84,9 @@ class AccessService {
         //save again refreshtoken, privkey, pubkey to db
          await KeyTokenService.createKeyToken({
             refreshToken:tokens.refreshToken,
-            privateKey,publicKey,userId
+            privateKey,
+            publicKey,
+            userId
          })   
 
         return {
