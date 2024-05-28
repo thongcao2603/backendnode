@@ -61,7 +61,7 @@ var productSchema = new Schema({
         index:true,
         select:false
     },
-    isPublic:{
+    isPublished:{
         type:Boolean,
         default:false,
         index:true,
@@ -73,6 +73,7 @@ var productSchema = new Schema({
     collection:COLLECTION_NAME
 });
 
+productSchema.index({product_name:'text',product_description:'text'})
 productSchema.pre('save',function(next){
     this.product_slug = slugify(this.product_name,{lower:true})
     next()
