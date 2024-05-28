@@ -1,6 +1,7 @@
 'use strict'
 
 const {model,Schema,Types} = require('mongoose'); // Erase if already required
+const slugify = require('slugify')
 
 const DOCUMENT_NAME='Product'
 const COLLECTION_NAME='Products'
@@ -17,6 +18,9 @@ var productSchema = new Schema({
     },
     product_description:{
         type:String,
+    },
+    product_slug:{
+        type:String
     },
     product_price:{
         type:Number,
@@ -39,10 +43,40 @@ var productSchema = new Schema({
         type:Array,
         default:[]
     },
+    product_ratingsAverage:{
+        type:Number,
+        default:4.5,
+        min:[1,'Rating must be above 1.0'],
+        max:[5,'Rating must be above 5.0'],
+        set: (val) => Math.round(val *10)/10
+    },
+    product_variations:{
+        type:Array,
+        default:[],
+
+    },
+    isDraft:{
+        type:Boolean,
+        default:true,
+        index:true,
+        select:false
+    },
+    isPublic:{
+        type:Boolean,
+        default:false,
+        index:true,
+        select:false
+    }
+
 },{
     timestamps:true,
     collection:COLLECTION_NAME
 });
+
+productSchema.pre('save',function(next){
+    this.product_slug = slugify(this.product_name,{lower:true})
+    next()
+})
 
 const clothingSchema = new Schema({
     brand:{
