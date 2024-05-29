@@ -3,6 +3,7 @@
 const { product, clothing, electronic } = require('../models/product.model')
 const { BadRequestError } = require('../core/error.response')
 const { findAllDraftsForShop, publishProductByShop, findAllPublishedForShop, searchProductByUser, findAllProducts, findProductDetail } = require('../models/repo/product.repo')
+const { insertInventory } = require('../models/repo/inventory.repo')
 
 class ProductFactory {  
     static productRegistry={}
@@ -74,7 +75,17 @@ class Product {
         this.product_quantity = product_quantity
     }
     async createProduct(id) {
-        return await product.create({...this,_id:id})
+        const newProduct= await product.create({...this,_id:id})
+        if (newProduct){
+            //add stock in inventory collection
+            await insertInventory({
+                productId:newProduct._id,
+                shopId:this.product_shop,
+                stock:this.product_quantity
+            })
+        }
+
+        return newProduct
     }
 }
 
